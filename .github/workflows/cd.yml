@@ -1,0 +1,31 @@
+name: CD - DockerHub Deployment
+
+on:
+  workflow_call:
+
+jobs:
+  deploy-docker:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Docker Login
+        run: echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Build Docker image
+        run: docker build --platform linux/amd64  -t $DOCKER_USERNAME/agtc-srv-ingestion:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push $DOCKER_USERNAME/agtc-srv-ingestion:${{ github.sha }}
+          docker tag $DOCKER_USERNAME/agtc-srv-ingestion:${{ github.sha }} $DOCKER_USERNAME/agtc-srv-ingestion:latest
+          docker push $DOCKER_USERNAME/agtc-srv-ingestion:latest
+
+      - name: Finalizado
+        run: echo "Imagem publicada no Docker Hub com sucesso!"

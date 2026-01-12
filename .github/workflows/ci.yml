@@ -1,0 +1,79 @@
+name: CI .NET + SonarCloud
+
+on:
+  pull_request:
+  workflow_call: 
+
+jobs:
+  build-test-sonar:
+    runs-on: ubuntu-latest
+
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'  # Ajuste conforme sua versão
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Begin SonarCloud Analysis
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            dotnet sonarscanner begin \
+              /k:"JPedroDuarte23_agtc-srv-ingestion" \
+              /o:"jpedroduarte23" \
+              /d:sonar.login="$SONAR_TOKEN" \
+              /d:sonar.coverageReportPaths="./coverage-report/SonarQube.xml" \
+              /d:sonar.pullrequest.key="${{ github.event.pull_request.number }}" \
+              /d:sonar.pullrequest.branch="${{ github.head_ref }}" \
+              /d:sonar.pullrequest.base="${{ github.base_ref }}"
+          else
+            dotnet sonarscanner begin \
+              /k:"JPedroDuarte23_agtc-srv-ingestion" \
+              /o:"jpedroduarte23" \
+              /d:sonar.login="$SONAR_TOKEN" \
+              /d:sonar.coverageReportPaths="./coverage-report/SonarQube.xml"
+          fi
+
+      - name: Build solution
+        run: dotnet build
+
+      - name: Run Tests with Coverage
+        run: dotnet test --collect:"XPlat Code Coverage"
+
+      - name: Generate Sonar Coverage Report
+        run: |
+          reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
+
+      - name: End SonarCloud Analysis
+        run: dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+
+      - name: SonarCloud Coverage Check
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          RESPONSE=$(curl -s -u $SONAR_TOKEN "https://sonarcloud.io/api/measures/component?component=JPedroDuarte23_agtc-srv-ingestion&metricKeys=coverage")
+
+          echo "$RESPONSE"
+          
+          COVERAGE=$(echo "$RESPONSE" | jq -r '.component.measures[0].value')
+          echo "Cobertura: $COVERAGE%"
+      
+          COVERAGE_INT=${COVERAGE%.*}
+          if [ "$COVERAGE_INT" -lt 70 ]; then
+            echo "❌ Cobertura abaixo de 70%"
+            exit 1
+          else
+            echo "✅ Cobertura adequada"
+          fi
+      

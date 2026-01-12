@@ -1,0 +1,26 @@
+name: CI/CD Orquestrador
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  call-ci:
+    if: github.ref == 'refs/heads/main' || github.event.pull_request.merged == true
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  call-cd:
+    needs: call-ci
+    if: success()
+    uses: ./.github/workflows/cd.yml
+    secrets: inherit
+  call-deploy:
+    needs: call-cd
+    if: success()
+    uses: ./.github/workflows/deploy-aws.yml
+    secrets: inherit
