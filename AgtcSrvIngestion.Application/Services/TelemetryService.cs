@@ -40,7 +40,7 @@ public class TelemetryService : ITelemetryService
             ReportedBy = deviceId
         });
 
-        var topicArn = _configuration["SnsTopic:TelemetryTopicArn"];
+        var topicArn = _configuration["SnsTopics:TelemetryTopicArn"];
 
         var publishRequest = new PublishRequest
         {
