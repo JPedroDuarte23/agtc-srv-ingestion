@@ -23,7 +23,7 @@ public class TelemetryServiceTests
         
         // Mock para retornar o Topic ARN
         _mockConfiguration
-            .Setup(x => x["AWS:SnsTopicArn"])
+            .Setup(x => x["SnsTopics:TelemetryTopicArn"])
             .Returns("arn:aws:sns:us-east-1:123456789:test-topic");
 
         _service = new TelemetryService(_mockSnsClient.Object, _mockConfiguration.Object);
@@ -314,7 +314,7 @@ public class TelemetryServiceTests
         // Arrange
         var topicArn = "arn:aws:sns:us-west-2:999999999:custom-topic";
         var mockConfig = new Mock<IConfiguration>();
-        mockConfig.Setup(x => x["AWS:SnsTopicArn"]).Returns(topicArn);
+        mockConfig.Setup(x => x["SnsTopics:TelemetryTopicArn"]).Returns(topicArn);
         
         var service = new TelemetryService(_mockSnsClient.Object, mockConfig.Object);
         
