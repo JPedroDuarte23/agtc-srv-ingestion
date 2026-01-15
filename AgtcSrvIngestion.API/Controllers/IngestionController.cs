@@ -11,7 +11,7 @@ namespace AgtcSrvIngestion.API.Controllers;
 [Authorize(Roles = "Device")] // <--- AQUI ESTÁ A SEGURANÇA! Só sensores entram.
 public class TelemetryController : ControllerBase
 {
-    private readonly ILogger<TelemetryController _logger;
+    private readonly ILogger<TelemetryController> _logger;
     private readonly ITelemetryService _service;
 
     public TelemetryController()

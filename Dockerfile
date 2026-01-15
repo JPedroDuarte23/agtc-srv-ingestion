@@ -1,30 +1,44 @@
-# Acesse https://aka.ms/customizecontainer para saber como personalizar seu contêiner de depuração e como o Visual Studio usa este Dockerfile para criar suas imagens para uma depuração mais rápida.
-
-# Esta fase é usada durante a execução no VS no modo rápido (Padrão para a configuração de Depuração)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
 
+RUN apk add --no-cache curl
 
-# Esta fase é usada para compilar o projeto de serviço
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["AgtcSrvIngestion/AgtcSrvIngestion.csproj", "AgtcSrvIngestion/"]
-RUN dotnet restore "./AgtcSrvIngestion/AgtcSrvIngestion.csproj"
+ARG NEW_RELIC_AGENT_VERSION=10.26.0
+
+RUN curl -L https://download.newrelic.com/dot_net_agent/previous_releases/${NEW_RELIC_AGENT_VERSION}/newrelic-dotnet-agent_${NEW_RELIC_AGENT_VERSION}_amd64.tar.gz | tar -C . -xz
+
+COPY agtc-srv-ingestion.sln .
+COPY AgtcSrvIngestion.API/*.csproj ./AgtcSrvIngestion.API/
+COPY AgtcSrvIngestion.Application/*.csproj ./AgtcSrvIngestion.Application/
+COPY AgtcSrvIngestion.Domain/*.csproj ./AgtcSrvIngestion.Domain/
+COPY AgtcSrvIngestion.Infrastructure/*.csproj ./AgtcSrvIngestion.Infrastructure/
+COPY AgtcSrvIngestion.Test/*.csproj ./AgtcSrvIngestion.Test/
+
+RUN dotnet restore
+
 COPY . .
-WORKDIR "/src/AgtcSrvIngestion"
-RUN dotnet build "./AgtcSrvIngestion.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish AgtcSrvIngestion.API/AgtcSrvIngestion.API.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-# Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AgtcSrvIngestion.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "AgtcSrvIngestion.dll"]
+
+RUN apk add --no-cache icu-libs
+
+COPY --from=build /app/newrelic-dotnet-agent /usr/local/newrelic-dotnet-agent
+
+ENV CORECLR_ENABLE_PROFILING=1 \
+    CORECLR_NEWRELIC_HOME=/usr/local/newrelic-dotnet-agent \
+    CORECLR_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so \
+    CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A} \
+    NEW_RELIC_APP_NAME="AgtcSrvIngestion"
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /app && chown -R appuser:appgroup /usr/local/newrelic-dotnet-agent
+
+USER appuser
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "AgtcSrvIngestion.API.dll"]
