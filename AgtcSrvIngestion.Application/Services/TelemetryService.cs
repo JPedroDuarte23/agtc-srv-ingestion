@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using AgtcSrvIngestion.Application.Dtos;
+using AgtcSrvIngestion.Application.Exceptions;
+using AgtcSrvIngestion.Application.Interfaces;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using Microsoft.Extensions.Configuration;
+
+namespace AgtcSrvIngestion.Application.Services;
+
+public class TelemetryService : ITelemetryService
+{
+
+    private readonly IAmazonSimpleNotificationService _snsClient;
+    private readonly IConfiguration _configuration;
+
+    public TelemetryService(IAmazonSimpleNotificationService snsClient, IConfiguration configuration)
+    {
+        _snsClient = snsClient;
+        _configuration = configuration;
+    }
+
+    public async Task ProcessTelemetryAsync(Guid deviceId, TelemetryRequest request)
+    {
+        if (request.Value < -100 || request.Value > 200)
+            throw new BadRequestException("Valor fora dos limites operacionais.");
+
+        var messageBody = JsonSerializer.Serialize(new
+        {
+            request.FieldId,
+            request.SensorType,
+            request.Value,
+            request.Timestamp,
+            ProcessingId = Guid.NewGuid(),
+            ReportedBy = deviceId
+        });
+
+        var topicArn = _configuration["AWS:SnsTopicArn"];
+
+        var publishRequest = new PublishRequest
+        {
+            TopicArn = topicArn,
+            Message = messageBody,
+            // Atributos ajudam a filtrar mensagens no futuro se precisar
+            MessageAttributes = new Dictionary<string, MessageAttributeValue>
+            {
+                { "SensorType", new MessageAttributeValue { DataType = "String", StringValue = request.SensorType } }
+            }
+        };
+
+        try
+        {
+            await _snsClient.PublishAsync(publishRequest);
+        }
+        catch (Exception ex)
+        {
+            throw new UnexpectedException(ex);
+        }
+    }
+}
