@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgtcSrvIngestion.Infrastruc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgtcSrvIngestion.Test", "AgtcSrvIngestion.Test\AgtcSrvIngestion.Test.csproj", "{95156CB1-600E-4229-A295-BAC507AFB360}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgtcSrvIngestion.API", "AgtcSrvManagement.API\AgtcSrvIngestion.API.csproj", "{7296CCF6-EF8F-49B1-9B85-B6329396224C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgtcSrvIngestion.API", "AgtcSrvIngestion.API\AgtcSrvIngestion.API.csproj", "{7296CCF6-EF8F-49B1-9B85-B6329396224C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
