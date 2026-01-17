@@ -7,15 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace AgtcSrvIngestion.API.Controllers;
 
 [ApiController]
-[Route("api/telemetry")]
-[Authorize(Roles = "Device")] // <--- AQUI ESTÁ A SEGURANÇA! Só sensores entram.
+[Route("v1/api/telemetry")]
+[Authorize(Roles = "Sensor")]
 public class TelemetryController : ControllerBase
 {
     private readonly ILogger<TelemetryController> _logger;
     private readonly ITelemetryService _service;
 
-    public TelemetryController()
+    public TelemetryController(ILogger<TelemetryController> logger, ITelemetryService service)
     {
+        _logger = logger;
+        _service = service;
     }
 
     [HttpPost]

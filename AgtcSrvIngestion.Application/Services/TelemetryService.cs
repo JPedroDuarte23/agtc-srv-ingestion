@@ -37,7 +37,7 @@ public class TelemetryService : ITelemetryService
             request.Value,
             request.Timestamp,
             ProcessingId = Guid.NewGuid(),
-            ReportedBy = deviceId
+            SensorDeviceId = deviceId
         });
 
         var topicArn = _configuration["SnsTopics:TelemetryTopicArn"];
