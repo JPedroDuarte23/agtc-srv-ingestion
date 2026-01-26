@@ -109,7 +109,7 @@ public class TelemetryServiceTests
         // Assert
         Assert.NotNull(capturedRequest);
         var messageBody = JsonSerializer.Deserialize<JsonElement>(capturedRequest.Message);
-        Assert.Equal(deviceId.ToString(), messageBody.GetProperty("ReportedBy").GetGuid().ToString());
+        Assert.Equal(deviceId.ToString(), messageBody.GetProperty("SensorDeviceId").GetGuid().ToString());
     }
 
     [Fact]
@@ -406,7 +406,7 @@ public class TelemetryServiceTests
         Assert.True(messageBody.TryGetProperty("Value", out _));
         Assert.True(messageBody.TryGetProperty("Timestamp", out _));
         Assert.True(messageBody.TryGetProperty("ProcessingId", out _));
-        Assert.True(messageBody.TryGetProperty("ReportedBy", out _));
+        Assert.True(messageBody.TryGetProperty("SensorDeviceId", out _));
     }
 
     #endregion

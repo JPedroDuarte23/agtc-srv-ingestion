@@ -21,7 +21,7 @@ public class TelemetryControllerTests
         _mockLogger = new Mock<ILogger<TelemetryController>>();
         _mockTelemetryService = new Mock<ITelemetryService>();
         
-        _controller = new TelemetryController();
+        _controller = new TelemetryController(_mockLogger.Object, _mockTelemetryService.Object);
         
         // Setup the controller with mocked service via reflection since there's no public constructor
         var serviceField = typeof(TelemetryController).GetField("_service", 
