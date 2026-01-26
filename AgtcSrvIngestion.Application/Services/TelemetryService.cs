@@ -27,7 +27,7 @@ public class TelemetryService : ITelemetryService
 
     public async Task ProcessTelemetryAsync(Guid deviceId, TelemetryRequest request)
     {
-        if (request.Value < -100 || request.Value > 200)
+        if (request.Value < -100 || request.Value > 10000)
             throw new BadRequestException("Valor fora dos limites operacionais.");
 
         var messageBody = JsonSerializer.Serialize(new
