@@ -65,7 +65,7 @@ if (!builder.Environment.IsDevelopment())
 else
 {
     Log.Information("Ambiente de Desenvolvimento. Usando chave estática do appsettings.");
-    jwtSigningKey = builder.Configuration["Jwt:Secret"] ?? builder.Configuration["Jwt:DevKey"]!;
+    jwtSigningKey = builder.Configuration["Jwt:SigningKey"] ?? builder.Configuration["Jwt:DevKey"]!;
 
     if (string.IsNullOrEmpty(jwtSigningKey))
     {
