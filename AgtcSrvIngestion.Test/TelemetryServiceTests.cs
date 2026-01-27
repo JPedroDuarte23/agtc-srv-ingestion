@@ -43,12 +43,16 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         _mockSnsClient.Verify(
@@ -69,6 +73,11 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -76,7 +85,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);
@@ -97,6 +106,11 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -104,7 +118,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);
@@ -124,12 +138,16 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act & Assert - Should not throw
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
         _mockSnsClient.Verify(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -145,12 +163,16 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act & Assert - Should not throw
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
         _mockSnsClient.Verify(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -166,6 +188,10 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -173,7 +199,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);
@@ -198,9 +224,14 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         // Act & Assert
         var exception = await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
         
         Assert.Contains("Valor fora dos limites operacionais", exception.Message);
     }
@@ -217,9 +248,13 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         // Act & Assert
         var exception = await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
         
         Assert.Contains("Valor fora dos limites operacionais", exception.Message);
     }
@@ -236,9 +271,13 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         // Act & Assert
         await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
     }
 
     [Fact]
@@ -253,9 +292,13 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         // Act & Assert
         await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
     }
 
     #endregion
@@ -274,13 +317,17 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new HttpRequestException("SNS service unavailable"));
 
         // Act & Assert
         await Assert.ThrowsAsync<UnexpectedException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
     }
 
     [Fact]
@@ -295,13 +342,17 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("AWS credentials invalid"));
 
         // Act & Assert
         await Assert.ThrowsAsync<UnexpectedException>(
-            () => _service.ProcessTelemetryAsync(deviceId, request));
+            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
     }
 
     #endregion
@@ -326,6 +377,10 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -333,7 +388,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await service.ProcessTelemetryAsync(deviceId, request);
+        await service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);
@@ -359,6 +414,10 @@ public class TelemetryServiceTests
             Timestamp: DateTime.UtcNow
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -366,7 +425,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);
@@ -388,6 +447,10 @@ public class TelemetryServiceTests
             Timestamp: timestamp
         );
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         PublishRequest capturedRequest = null;
         _mockSnsClient
             .Setup(x => x.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()))
@@ -395,7 +458,7 @@ public class TelemetryServiceTests
             .ReturnsAsync(new PublishResponse { MessageId = "test-message-id" });
 
         // Act
-        await _service.ProcessTelemetryAsync(deviceId, request);
+        await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 
         // Assert
         Assert.NotNull(capturedRequest);

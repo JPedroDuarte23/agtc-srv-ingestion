@@ -24,9 +24,9 @@ public class TelemetryController : ControllerBase
     public async Task<IActionResult> PostTelemetry([FromBody] TelemetryRequest request)
     {
         var deviceId = Guid.Parse(User.FindFirstValue(ClaimTypes.Name)!); 
-        var farmerName = Guid.Parse(User.FindFirstValue("FarmerName")!);
-        var fieldName = Guid.Parse(User.FindFirstValue("FieldName")!);
-        var propertyName = Guid.Parse(User.FindFirstValue("PropertyName")!);
+        var farmerName = User.FindFirstValue("FarmerName")!;
+        var fieldName = User.FindFirstValue("FieldName")!;
+        var propertyName = User.FindFirstValue("PropertyName")!;
 
         await _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request);
 

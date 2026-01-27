@@ -50,7 +50,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -66,7 +66,10 @@ public class TelemetryControllerTests
         // Arrange
         var deviceId = Guid.NewGuid();
         SetupControllerUser(deviceId);
-        
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         var request = new TelemetryRequest(
             FieldId: Guid.NewGuid(),
             SensorType: "Humidity",
@@ -75,7 +78,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -83,7 +86,7 @@ public class TelemetryControllerTests
 
         // Assert
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, request),
+            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
             Times.Once);
     }
 
@@ -93,7 +96,10 @@ public class TelemetryControllerTests
         // Arrange
         var deviceId = Guid.NewGuid();
         SetupControllerUser(deviceId);
-        
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         var request = new TelemetryRequest(
             FieldId: Guid.NewGuid(),
             SensorType: "Temperature",
@@ -102,7 +108,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -110,7 +116,7 @@ public class TelemetryControllerTests
 
         // Assert
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()),
+            x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()),
             Times.Once);
     }
 
@@ -135,7 +141,7 @@ public class TelemetryControllerTests
 
         TelemetryRequest capturedRequest = null;
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Callback<Guid, TelemetryRequest>((id, req) => capturedRequest = req)
             .Returns(Task.CompletedTask);
 
@@ -165,7 +171,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -195,7 +201,7 @@ public class TelemetryControllerTests
         };
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -206,7 +212,7 @@ public class TelemetryControllerTests
 
         // Assert
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()),
+            x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()),
             Times.Exactly(3));
     }
 
@@ -217,11 +223,15 @@ public class TelemetryControllerTests
         var deviceId1 = Guid.NewGuid();
         var deviceId2 = Guid.NewGuid();
 
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         var request1 = new TelemetryRequest(Guid.NewGuid(), "Temperature", 25.0, DateTime.UtcNow);
         var request2 = new TelemetryRequest(Guid.NewGuid(), "Temperature", 30.0, DateTime.UtcNow);
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act - First request with device 1
@@ -234,10 +244,10 @@ public class TelemetryControllerTests
 
         // Assert
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId1, request1),
+            x => x.ProcessTelemetryAsync(deviceId1, farmerName, fieldName, propertyName, request1),
             Times.Once);
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId2, request2),
+            x => x.ProcessTelemetryAsync(deviceId2, farmerName, fieldName, propertyName, request2),
             Times.Once);
     }
 
@@ -251,7 +261,10 @@ public class TelemetryControllerTests
         // Arrange
         var deviceId = Guid.NewGuid();
         SetupControllerUser(deviceId);
-        
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
+
         var request = new TelemetryRequest(
             FieldId: Guid.NewGuid(),
             SensorType: "Temperature",
@@ -260,7 +273,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -269,7 +282,7 @@ public class TelemetryControllerTests
         // Assert
         Assert.IsType<AcceptedResult>(result);
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, request),
+            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
             Times.Once);
     }
 
@@ -279,7 +292,7 @@ public class TelemetryControllerTests
         // Arrange
         var deviceId = Guid.NewGuid();
         SetupControllerUser(deviceId);
-        
+
         var request = new TelemetryRequest(
             FieldId: Guid.NewGuid(),
             SensorType: "Humidity",
@@ -288,7 +301,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -313,7 +326,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -330,6 +343,9 @@ public class TelemetryControllerTests
         var deviceId = Guid.NewGuid();
         SetupControllerUser(deviceId);
         var currentTime = DateTime.UtcNow;
+        var fieldName = "fieldName";
+        var farmerName = "farmerName";
+        var propertyName = "propertyName";
 
         var request = new TelemetryRequest(
             FieldId: Guid.NewGuid(),
@@ -339,7 +355,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -347,7 +363,7 @@ public class TelemetryControllerTests
 
         // Assert
         _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, request),
+            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
             Times.Once);
     }
 
@@ -367,7 +383,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -393,7 +409,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -423,7 +439,7 @@ public class TelemetryControllerTests
 
         var exception = new BadRequestException("Valor fora dos limites operacionais");
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .ThrowsAsync(exception);
 
         // Act & Assert
@@ -447,7 +463,7 @@ public class TelemetryControllerTests
 
         var exception = new UnexpectedException(new HttpRequestException("SNS unavailable"));
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .ThrowsAsync(exception);
 
         // Act & Assert
@@ -470,7 +486,7 @@ public class TelemetryControllerTests
         );
 
         _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<TelemetryRequest>()))
+            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
             .ThrowsAsync(new Exception("Service error"));
 
         // Act & Assert
