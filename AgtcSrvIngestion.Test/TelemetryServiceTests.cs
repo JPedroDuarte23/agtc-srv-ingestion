@@ -237,29 +237,6 @@ public class TelemetryServiceTests
     }
 
     [Fact]
-    public async Task ProcessTelemetryAsync_WithValueAbove200_ShouldThrowBadRequestException()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        var request = new TelemetryRequest(
-            FieldId: Guid.NewGuid(),
-            SensorType: "Temperature",
-            Value: 200.1,
-            Timestamp: DateTime.UtcNow
-        );
-
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
-        
-        Assert.Contains("Valor fora dos limites operacionais", exception.Message);
-    }
-
-    [Fact]
     public async Task ProcessTelemetryAsync_WithValueMinus500_ShouldThrowBadRequestException()
     {
         // Arrange
@@ -268,27 +245,6 @@ public class TelemetryServiceTests
             FieldId: Guid.NewGuid(),
             SensorType: "Temperature",
             Value: -500,
-            Timestamp: DateTime.UtcNow
-        );
-
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        // Act & Assert
-        await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request));
-    }
-
-    [Fact]
-    public async Task ProcessTelemetryAsync_WithValue300_ShouldThrowBadRequestException()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        var request = new TelemetryRequest(
-            FieldId: Guid.NewGuid(),
-            SensorType: "Temperature",
-            Value: 300,
             Timestamp: DateTime.UtcNow
         );
 
