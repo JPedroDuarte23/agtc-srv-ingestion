@@ -25,7 +25,7 @@ public class TelemetryService : ITelemetryService
         _configuration = configuration;
     }
 
-    public async Task ProcessTelemetryAsync(Guid deviceId, TelemetryRequest request)
+    public async Task ProcessTelemetryAsync(Guid deviceId, string farmerName, string fieldName, string propertyName, TelemetryRequest request)
     {
         if (request.Value < -100 || request.Value > 10000)
             throw new BadRequestException("Valor fora dos limites operacionais.");
@@ -33,6 +33,9 @@ public class TelemetryService : ITelemetryService
         var messageBody = JsonSerializer.Serialize(new
         {
             request.FieldId,
+            fieldName,
+            propertyName,
+            farmerName,
             request.SensorType,
             request.Value,
             request.Timestamp,
@@ -46,7 +49,6 @@ public class TelemetryService : ITelemetryService
         {
             TopicArn = topicArn,
             Message = messageBody,
-            // Atributos ajudam a filtrar mensagens no futuro se precisar
             MessageAttributes = new Dictionary<string, MessageAttributeValue>
             {
                 { "SensorType", new MessageAttributeValue { DataType = "String", StringValue = request.SensorType } }

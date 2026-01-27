@@ -9,5 +9,5 @@ namespace AgtcSrvIngestion.Application.Interfaces;
 
 public interface ITelemetryService
 {
-    Task ProcessTelemetryAsync(Guid deviceId, TelemetryRequest request);
+    Task ProcessTelemetryAsync(Guid deviceId, string farmerName, string fieldName, string propertyName, TelemetryRequest request);
 }
