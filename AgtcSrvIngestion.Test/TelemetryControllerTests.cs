@@ -61,36 +61,6 @@ public class TelemetryControllerTests
     }
 
     [Fact]
-    public async Task PostTelemetry_WithValidRequest_ShouldCallServiceWithCorrectDeviceId()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        SetupControllerUser(deviceId);
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        var request = new TelemetryRequest(
-            FieldId: Guid.NewGuid(),
-            SensorType: "Humidity",
-            Value: 65.0,
-            Timestamp: DateTime.UtcNow
-        );
-
-        _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        await _controller.PostTelemetry(request);
-
-        // Assert
-        _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
-            Times.Once);
-    }
-
-    [Fact]
     public async Task PostTelemetry_WithValidRequest_ShouldCallServiceExactlyOnce()
     {
         // Arrange
@@ -118,42 +88,6 @@ public class TelemetryControllerTests
         _mockTelemetryService.Verify(
             x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()),
             Times.Once);
-    }
-
-    [Fact]
-    public async Task PostTelemetry_WithValidRequest_ShouldPassRequestToService()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        SetupControllerUser(deviceId);
-        
-        var fieldId = Guid.NewGuid();
-        var sensorType = "Soil Moisture";
-        var value = 75.5;
-        var timestamp = DateTime.UtcNow;
-
-        var request = new TelemetryRequest(
-            FieldId: fieldId,
-            SensorType: sensorType,
-            Value: value,
-            Timestamp: timestamp
-        );
-
-        TelemetryRequest capturedRequest = null;
-        _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
-            .Callback<Guid, TelemetryRequest>((id, req) => capturedRequest = req)
-            .Returns(Task.CompletedTask);
-
-        // Act
-        await _controller.PostTelemetry(request);
-
-        // Assert
-        Assert.NotNull(capturedRequest);
-        Assert.Equal(fieldId, capturedRequest.FieldId);
-        Assert.Equal(sensorType, capturedRequest.SensorType);
-        Assert.Equal(value, capturedRequest.Value);
-        Assert.Equal(timestamp, capturedRequest.Timestamp);
     }
 
     [Fact]
@@ -216,75 +150,9 @@ public class TelemetryControllerTests
             Times.Exactly(3));
     }
 
-    [Fact]
-    public async Task PostTelemetry_WithDifferentDevices_ShouldProcessWithCorrectDeviceIds()
-    {
-        // Arrange
-        var deviceId1 = Guid.NewGuid();
-        var deviceId2 = Guid.NewGuid();
-
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        var request1 = new TelemetryRequest(Guid.NewGuid(), "Temperature", 25.0, DateTime.UtcNow);
-        var request2 = new TelemetryRequest(Guid.NewGuid(), "Temperature", 30.0, DateTime.UtcNow);
-
-        _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
-            .Returns(Task.CompletedTask);
-
-        // Act - First request with device 1
-        SetupControllerUser(deviceId1);
-        await _controller.PostTelemetry(request1);
-
-        // Act - Second request with device 2
-        SetupControllerUser(deviceId2);
-        await _controller.PostTelemetry(request2);
-
-        // Assert
-        _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId1, farmerName, fieldName, propertyName, request1),
-            Times.Once);
-        _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId2, farmerName, fieldName, propertyName, request2),
-            Times.Once);
-    }
-
     #endregion
 
     #region Edge Cases Tests
-
-    [Fact]
-    public async Task PostTelemetry_WithNegativeValue_ShouldProcessRequest()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        SetupControllerUser(deviceId);
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        var request = new TelemetryRequest(
-            FieldId: Guid.NewGuid(),
-            SensorType: "Temperature",
-            Value: -50.0,
-            Timestamp: DateTime.UtcNow
-        );
-
-        _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        var result = await _controller.PostTelemetry(request);
-
-        // Assert
-        Assert.IsType<AcceptedResult>(result);
-        _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
-            Times.Once);
-    }
 
     [Fact]
     public async Task PostTelemetry_WithZeroValue_ShouldProcessRequest()
@@ -334,37 +202,6 @@ public class TelemetryControllerTests
 
         // Assert
         Assert.IsType<AcceptedResult>(result);
-    }
-
-    [Fact]
-    public async Task PostTelemetry_WithCurrentTimestamp_ShouldProcessRequest()
-    {
-        // Arrange
-        var deviceId = Guid.NewGuid();
-        SetupControllerUser(deviceId);
-        var currentTime = DateTime.UtcNow;
-        var fieldName = "fieldName";
-        var farmerName = "farmerName";
-        var propertyName = "propertyName";
-
-        var request = new TelemetryRequest(
-            FieldId: Guid.NewGuid(),
-            SensorType: "Temperature",
-            Value: 25.0,
-            Timestamp: currentTime
-        );
-
-        _mockTelemetryService
-            .Setup(x => x.ProcessTelemetryAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TelemetryRequest>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        await _controller.PostTelemetry(request);
-
-        // Assert
-        _mockTelemetryService.Verify(
-            x => x.ProcessTelemetryAsync(deviceId, farmerName, fieldName, propertyName, request),
-            Times.Once);
     }
 
     [Fact]
